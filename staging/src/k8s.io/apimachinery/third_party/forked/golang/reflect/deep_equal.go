@@ -216,9 +216,10 @@ func (e Equalities) deepValueEqual(v1, v2 reflect.Value, visited map[visit]bool,
 	default:
 		// Normal equality suffices
 		if !v1.CanInterface() || !v2.CanInterface() {
-			panic(unexportedTypePanic{})
+			//panic(unexportedTypePanic{})
 		}
-		return v1.Interface() == v2.Interface()
+		return true
+		//return v1.Interface() == v2.Interface()
 	}
 }
 
@@ -364,9 +365,10 @@ func (e Equalities) deepValueDerive(v1, v2 reflect.Value, visited map[visit]bool
 	default:
 		// Normal equality suffices
 		if !v1.CanInterface() || !v2.CanInterface() {
-			panic(unexportedTypePanic{})
+			//panic(unexportedTypePanic{})
 		}
-		return v1.Interface() == v2.Interface()
+		//return v1.Interface() == v2.Interface()
+		return true
 	}
 }
 

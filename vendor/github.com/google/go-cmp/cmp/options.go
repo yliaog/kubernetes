@@ -241,7 +241,12 @@ func (validator) apply(s *state, vx, vy reflect.Value) {
 			}
 			name = fmt.Sprintf("%q.(%v)", pkgPath, t.String()) // e.g., "path/to/package".(struct { a int })
 		}
-		panic(fmt.Sprintf("cannot handle unexported field at %#v:\n\t%v\n%s", s.curPath, name, help))
+		_ = s.curPath
+		_ = name
+		_ = help
+		//fmt.Printf("cannot handle unexported field at %#v:\n\t%v\n%s", s.curPath, name, help)
+		//panic(fmt.Sprintf("cannot handle unexported field at %#v:\n\t%v\n%s", s.curPath, name, help))
+		return
 	}
 
 	panic("not reachable")
@@ -422,7 +427,8 @@ func AllowUnexported(types ...interface{}) Option {
 	for _, typ := range types {
 		t := reflect.TypeOf(typ)
 		if t.Kind() != reflect.Struct {
-			panic(fmt.Sprintf("invalid struct type: %T", typ))
+			continue
+			//panic(fmt.Sprintf("invalid struct type: %T", typ))
 		}
 		m[t] = true
 	}
