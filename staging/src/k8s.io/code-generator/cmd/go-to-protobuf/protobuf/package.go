@@ -150,7 +150,7 @@ func (p *protobufPackage) ExtractGeneratedType(t *ast.TypeSpec) bool {
 	switch s := t.Type.(type) {
 	case *ast.StructType:
 		for i, f := range s.Fields.List {
-			if len(f.Tag.Value) == 0 {
+			if f.Tag == nil || len(f.Tag.Value) == 0 {
 				continue
 			}
 			tag := strings.Trim(f.Tag.Value, "`")

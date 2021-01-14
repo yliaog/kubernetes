@@ -254,7 +254,9 @@ func Run(g *Generator) {
 			searchArgs = append(searchArgs, "-I", s)
 		}
 	}
-	args := append(searchArgs, fmt.Sprintf("--gogo_out=%s", g.OutputBase))
+	args := append(searchArgs, fmt.Sprintf("--go_out=%s", g.OutputBase))
+
+	args = append(args, "--experimental_allow_proto3_optional")
 
 	buf := &bytes.Buffer{}
 	if len(g.Conditional) > 0 {

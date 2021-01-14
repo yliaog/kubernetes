@@ -96,6 +96,9 @@ func RewriteGeneratedGogoProtobufFile(name string, extractFn ExtractFunc, option
 			if dropEmptyImportDeclarations(d) {
 				continue
 			}
+			if dropGetterDeclarations(d) {
+				continue
+			}
 			decls = append(decls, d)
 		}
 		file.Decls = decls
@@ -349,6 +352,17 @@ func dropEmptyImportDeclarations(decl ast.Decl) bool {
 			return true
 		}
 		t.Specs = specs
+	}
+	return false
+}
+
+func dropGetterDeclarations(decl ast.Decl) bool {
+	switch t := decl.(type) {
+	case *ast.FuncDecl:
+		if strings.HasPrefix(t.Name.Name, "Get") {
+			return true
+		}
+
 	}
 	return false
 }

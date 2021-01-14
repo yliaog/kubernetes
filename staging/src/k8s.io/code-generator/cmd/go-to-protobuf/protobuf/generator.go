@@ -387,8 +387,10 @@ func (b bodyGen) doStruct(sw *generator.SnippetWriter) error {
 			fmt.Fprintf(out, "repeated ")
 		case field.Required:
 			fmt.Fprintf(out, "required ")
-		default:
+		case field.Nullable:
 			fmt.Fprintf(out, "optional ")
+		default:
+			//fmt.Fprintf(out, "required ")
 		}
 		sw.Do(`$.Type|local$ $.Name$ = $.Tag$`, field)
 		if len(field.Extras) > 0 {
@@ -740,7 +742,7 @@ func formatProtoFile(source []byte) ([]byte, error) {
 func assembleProtoFile(w io.Writer, f *generator.File) {
 	w.Write(f.Header)
 
-	fmt.Fprint(w, "syntax = \"proto2\";\n\n")
+	fmt.Fprint(w, "syntax = \"proto3\";\n\n")
 
 	if len(f.PackageName) > 0 {
 		fmt.Fprintf(w, "package %s;\n\n", f.PackageName)

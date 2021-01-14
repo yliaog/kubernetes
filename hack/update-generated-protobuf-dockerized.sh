@@ -30,7 +30,18 @@ kube::golang::setup_env
 
 go install k8s.io/kubernetes/vendor/k8s.io/code-generator/cmd/go-to-protobuf
 go install k8s.io/kubernetes/vendor/k8s.io/code-generator/cmd/go-to-protobuf/protoc-gen-gogo
+#go get google.golang.org/protobuf/cmd/protoc-gen-go
+#go install google.golang.org/protobuf/cmd/protoc-gen-go
+go get github.com/golang/protobuf/protoc-gen-go
+CWD=`pwd`
+cd $GOPATH/src/github.com/golang/protobuf/; git checkout v1.4.3; go install github.com/golang/protobuf/protoc-gen-go; cd $CWD
 
+curl -Lo protoc-3.14.0-linux-x86_64.zip https://github.com/protocolbuffers/protobuf/releases/download/v3.14.0/protoc-3.14.0-linux-x86_64.zip
+unzip protoc-3.14.0-linux-x86_64.zip
+cp bin/protoc /go/bin/protoc
+
+protoc --version
+which protoc
 if [[ -z "$(which protoc)" || "$(protoc --version)" != "libprotoc 3."* ]]; then
   echo "Generating protobuf requires protoc 3.0.0-beta1 or newer. Please download and"
   echo "install the platform appropriate Protobuf package for your OS: "
