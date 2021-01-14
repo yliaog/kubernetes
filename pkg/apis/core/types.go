@@ -3756,6 +3756,35 @@ type ServicePort struct {
 	NodePort int32
 }
 
+// ServicePort represents the port on which the service is exposed
+
+type ServicePort2 struct {
+	// Optional if only one ServicePort is defined on this service: The
+	// name of this port within the service.  This must be a DNS_LABEL.
+	// All ports within a ServiceSpec must have unique names.  This maps to
+	// the 'Name' field in EndpointPort objects.
+	Name string
+
+	// The IP protocol for this port.  Supports "TCP", "UDP", and "SCTP".
+	Protocol Protocol
+
+	// The application protocol for this port.
+	// This field follows standard Kubernetes label syntax.
+	// Un-prefixed names are reserved for IANA standard service names (as per
+	// RFC-6335 and http://www.iana.org/assignments/service-names).
+	// Non-standard protocols should use prefixed names such as
+	// mycompany.com/my-custom-protocol.
+	// +optional
+	AppProtocol *string
+
+	// The port that will be exposed on the service.
+	Port int32
+
+	// The port on each node on which this service is exposed.
+	// Default is to auto-allocate a port if the ServiceType of this Service requires one.
+	NodePort int32
+}
+
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // Service is a named abstraction of software service (for example, mysql) consisting of local port

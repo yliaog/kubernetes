@@ -119,9 +119,16 @@ func SetDefaults_Service(obj *v1.Service) {
 		if sp.Protocol == "" {
 			sp.Protocol = v1.ProtocolTCP
 		}
-		if sp.TargetPort == intstr.FromInt(0) || sp.TargetPort == intstr.FromString("") {
+		if sp.TargetPort.Type == intstr.Int && sp.TargetPort.IntVal == 0 {
 			sp.TargetPort = intstr.FromInt(int(sp.Port))
 		}
+		if sp.TargetPort.Type == intstr.String && sp.TargetPort.StrVal == "" {
+			sp.TargetPort = intstr.FromInt(int(sp.Port))
+		}
+		/*
+			if sp.TargetPort == intstr.FromInt(0) || sp.TargetPort == intstr.FromString("") {
+				sp.TargetPort = intstr.FromInt(int(sp.Port))
+			}*/
 	}
 	// Defaults ExternalTrafficPolicy field for NodePort / LoadBalancer service
 	// to Global for consistency.
