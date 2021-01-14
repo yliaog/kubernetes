@@ -25,6 +25,8 @@ import (
 	"strconv"
 	"strings"
 
+	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+
 	"k8s.io/klog/v2"
 )
 
@@ -38,9 +40,12 @@ import (
 // +protobuf.options.(gogoproto.goproto_stringer)=false
 // +k8s:openapi-gen=true
 type IntOrString struct {
-	Type   Type   `protobuf:"varint,1,opt,name=type,casttype=Type"`
-	IntVal int32  `protobuf:"varint,2,opt,name=intVal"`
-	StrVal string `protobuf:"bytes,3,opt,name=strVal"`
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+	Type          Type   `protobuf:"varint,1,opt,name=type,casttype=Type"`
+	IntVal        int32  `protobuf:"varint,2,opt,name=intVal"`
+	StrVal        string `protobuf:"bytes,3,opt,name=strVal"`
 }
 
 // Type represents the stored type of IntOrString.
