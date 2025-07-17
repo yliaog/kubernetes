@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -47,11 +48,25 @@ import (
 	"k8s.io/utils/ptr"
 )
 
+// ExtendedResourceName returns hard coded extended resource name with a variable
+// suffix from the input integer when it's greater than 0.
+// "example.com/resource" is not special, any valid extended resource name can be used
+// instead, except when using example device plugin in the test, which hard coded it,
+// see test/e2e/dra/deploy_device_plugin.go.
+func ExtendedResourceName(i int) string {
+	suffix := ""
+	if i > 0 {
+		suffix = strconv.Itoa(i)
+	}
+	return "example.com/resource" + suffix
+}
+
 // Builder contains a running counter to make objects unique within thir
 // namespace.
 type Builder struct {
-	f      *framework.Framework
-	driver *Driver
+	f                       *framework.Framework
+	driver                  *Driver
+	UseExtendedResourceName bool
 
 	podCounter      int
 	claimCounter    int
@@ -65,11 +80,24 @@ func (b *Builder) ClassName() string {
 
 // Class returns the device Class that the builder's other objects
 // reference.
-func (b *Builder) Class() *resourceapi.DeviceClass {
+// The input i is used to pick the extended resource name whose suffix has the
+// same i for the device class, except for i == 0, where the device class
+// does not have ExtendedResourceName.
+func (b *Builder) Class(i int) *resourceapi.DeviceClass {
+	ern := ExtendedResourceName(i)
+	name := b.ClassName()
+	if i > 0 {
+		name = b.ClassName() + strconv.Itoa(i)
+	}
 	class := &resourceapi.DeviceClass{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: b.ClassName(),
+			Name: name,
 		},
+	}
+	if b.UseExtendedResourceName {
+		class.Spec = resourceapi.DeviceClassSpec{
+			ExtendedResourceName: &ern,
+		}
 	}
 	class.Spec.Selectors = []resourceapi.DeviceSelector{{
 		CEL: &resourceapi.CELDeviceSelector{
@@ -415,7 +443,7 @@ func TestContainerEnv(ctx context.Context, f *framework.Framework, pod *v1.Pod, 
 		gomega.Expect(actualEnv).To(gomega.Equal(expectEnv), fmt.Sprintf("container %s env output:\n%s", containerName, stdout))
 	} else {
 		for i := 0; i < len(env); i += 2 {
-			envStr := fmt.Sprintf("\n%s=%s\n", env[i], env[i+1])
+			envStr := fmt.Sprintf("%s=%s\n", env[i], env[i+1])
 			gomega.Expect(stdout).To(gomega.ContainSubstring(envStr), fmt.Sprintf("container %s env variables", containerName))
 		}
 	}
@@ -436,7 +464,9 @@ func NewBuilderNow(ctx context.Context, f *framework.Framework, driver *Driver) 
 func (b *Builder) setUp(ctx context.Context) {
 	b.podCounter = 0
 	b.claimCounter = 0
-	b.Create(ctx, b.Class())
+	for i := range 6 {
+		b.Create(ctx, b.Class(i))
+	}
 	ginkgo.DeferCleanup(b.tearDown)
 }
 
