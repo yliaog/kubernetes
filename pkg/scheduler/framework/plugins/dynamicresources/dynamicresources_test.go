@@ -241,8 +241,8 @@ var (
 				Allocation(allocationResult).
 				Obj()
 	extendedResourceClaim = st.MakeResourceClaim().
-				Name("my-pod-0").
-				GenerateName("my-pod-").
+				Name("my-pod-extended-resources-0").
+				GenerateName("my-pod-extended-resources-").
 				Namespace(namespace).
 				Annotations(map[string]string{"resource.kubernetes.io/extended-resource-claim": "true"}).
 				OwnerRef(
@@ -259,7 +259,7 @@ var (
 		Obj()
 	extendedResourceClaimNoName = st.MakeResourceClaim().
 					Name(specialClaimInMemName).
-					GenerateName("my-pod-").
+					GenerateName("my-pod-extended-resources-").
 					Namespace(namespace).
 					Annotations(map[string]string{"resource.kubernetes.io/extended-resource-claim": "true"}).
 					OwnerRef(
@@ -276,8 +276,8 @@ var (
 		Obj()
 
 	extendedResourceClaimNode2 = st.MakeResourceClaim().
-					Name("my-pod-0").
-					GenerateName("my-pod-").
+					Name("my-pod-extended-resources-0").
+					GenerateName("my-pod-extended-resources-").
 					Namespace(namespace).
 					Annotations(map[string]string{"resource.kubernetes.io/extended-resource-claim": "true"}).
 					OwnerRef(
@@ -485,6 +485,19 @@ func TestPlugin(t *testing.T) {
 	}{
 		"empty": {
 			pod: st.MakePod().Name("foo").Namespace("default").Obj(),
+			want: want{
+				prefilter: result{
+					status: fwk.NewStatus(fwk.Skip),
+				},
+				postfilter: result{
+					status: fwk.NewStatus(fwk.Unschedulable),
+				},
+				prebindPreFlight: fwk.NewStatus(fwk.Skip),
+			},
+		},
+		"empty-with-extended-resources-enabled": {
+			enableDRAExtendedResource: true,
+			pod:                       st.MakePod().Name("foo").Namespace("default").Obj(),
 			want: want{
 				prefilter: result{
 					status: fwk.NewStatus(fwk.Skip),
