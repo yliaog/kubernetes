@@ -3500,7 +3500,9 @@ func testPlugin(tCtx ktesting.TContext) {
 				EnableDRAConsumableCapacity:        tc.enableDRAConsumableCapacity,
 				EnableDRAWorkloadResourceClaims:    tc.enableDRAWorkloadResourceClaims,
 			}
-
+			if !tc.enableDRAExtendedResource {
+				featuregatetesting.SetFeatureGateEmulationVersionDuringTest(tCtx, utilfeature.DefaultFeatureGate, version.MustParse("1.36"))
+			}
 			featuregatetesting.SetFeatureGateDuringTest(tCtx, utilfeature.DefaultFeatureGate, features.DRAExtendedResource, tc.enableDRAExtendedResource)
 			if tc.disableDRAAdminAccess {
 				featuregatetesting.SetFeatureGateEmulationVersionDuringTest(tCtx, utilfeature.DefaultFeatureGate, version.MustParse("1.35"))
