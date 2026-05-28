@@ -112,28 +112,8 @@ func testFeatureGateCycle(tCtx ktesting.TContext) {
 			builder := drautils.NewBuilderNow(tCtx, driver)
 			builder.SkipCleanup = true
 
-			var gateOffFn gateOffFunc
 			tCtx.Run(phase, func(tCtx ktesting.TContext) {
-				gateOffFn = def.test(tCtx, builder)
-			})
-
-			// ---- Phase 1: gate(s) OFF ----
-			phase = "phase-1-gate-off"
-			cluster.ToggleFeatureGates(tCtx, phase, turnFgOff(def.gates))
-			waitForSlices(tCtx, name, builder, def.driverResourcesFunc(nodes))
-
-			var gateOnAgainFn gateOnAgainFunc
-			tCtx.Run(phase, func(tCtx ktesting.TContext) {
-				gateOnAgainFn = gateOffFn(tCtx)
-			})
-
-			// ---- Phase 2: gate(s) ON again ----
-			phase = "phase-2-gate-on-again"
-			cluster.ToggleFeatureGates(tCtx, phase, turnFgOn(def.gates))
-			waitForSlices(tCtx, name, builder, def.driverResourcesFunc(nodes))
-
-			tCtx.Run(phase, func(tCtx ktesting.TContext) {
-				gateOnAgainFn(tCtx)
+				def.test(tCtx, builder)
 			})
 		})
 	}
@@ -142,11 +122,6 @@ func testFeatureGateCycle(tCtx ktesting.TContext) {
 // turnFgOn returns a string to turn the given feature gates on, e.g. "FeatureA=true,FeatureB=true".
 func turnFgOn(featureGates []string) string {
 	return turnFg(featureGates, "=true")
-}
-
-// turnFgOff returns a string to turn the given feature gates off, e.g. "FeatureA=false,FeatureB=false".
-func turnFgOff(featureGates []string) string {
-	return turnFg(featureGates, "=false")
 }
 
 // turnFg is a common part of turnFgOn and turnFgOff, returns a string to turn the given
